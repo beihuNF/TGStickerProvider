@@ -1,222 +1,383 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_constrainedWidth="true">
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@color/colorSurfaceCard"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/colorStrokeSubtle"
+    app:strokeWidth="1dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:maxWidth="330dp"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints">
+        android:padding="14dp">
 
-        <TextView
-            android:id="@+id/sticker_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/colorPrimaryAccent"
-            android:textSize="12sp"
-            android:textIsSelectable="true" />
+        <!-- 顶部：预览图 + 标题/格式/ID/进度条 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/sticker_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="16sp"
-            android:textIsSelectable="true" />
+            <FrameLayout
+                android:id="@+id/previewContainer"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_stat_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize15Percent"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <!-- 动图/视频首帧角标提示 -->
+                <ImageView
+                    android:id="@+id/animatedBadge"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="4dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_animated_badge"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/previewContainer"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- 标题行 + 格式徽章 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/sticker_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        tools:text="甘城なつき packed by @myadestes" />
+
+                    <TextView
+                        android:id="@+id/formatBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_badge_pill"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:textColor="@color/colorBadgeWebpText"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        tools:text="WEBP" />
+                </LinearLayout>
+
+                <!-- ID 行 + 类别徽章 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/sticker_id"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textIsSelectable="true"
+                        android:textSize="12sp"
+                        tools:text="myadestes_1_amashiro_natsuki" />
+
+                    <TextView
+                        android:id="@+id/categoryBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_badge_pill"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="10sp"
+                        android:visibility="gone"
+                        tools:text="Emoji"
+                        tools:visibility="visible" />
+                </LinearLayout>
+
+                <!-- 同步进度条 -->
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/syncProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:max="100"
+                    android:progress="0"
+                    app:indicatorColor="@color/colorBrandPrimary"
+                    app:trackColor="@color/colorSurfaceSubtle"
+                    app:trackCornerRadius="4dp"
+                    app:trackThickness="5dp" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 中部：三列清晰对齐的统计数据块 -->
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:baselineAligned="false"
             android:orientation="horizontal">
 
+            <!-- 已同步 -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="10sp"
-                android:orientation="vertical">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_box"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已同步"
-                    android:textAlignment="gravity"
-                    android:textSize="8sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/syncedAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="1111" />
-
-                    <TextView
-                        android:id="@+id/syncedStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-7sp"
-                        android:layout_weight="1"
-                        android:text="111\n111"
-                        android:textSize="8sp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginRight="10sp"
-                android:orientation="vertical">
+                    android:text="@string/stat_synced"
+                    android:textColor="@color/colorTextTertiary"
+                    android:textSize="11sp" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/syncedAll"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已导出"
-                    android:textAlignment="gravity"
-                    android:textSize="8sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/exportedAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="1111" />
-
-                    <TextView
-                        android:id="@+id/exportedStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-7sp"
-                        android:layout_weight="1"
-                        android:text="111\n111"
-                        android:textSize="8sp" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="120" />
 
                 <TextView
+                    android:id="@+id/syncedStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="包内总数"
-                    android:textAlignment="gravity"
-                    android:textSize="8sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/totalAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="1111" />
-
-                </LinearLayout>
-
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="10sp"
+                    tools:text="高 12 · 低 108" />
             </LinearLayout>
 
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <!-- 导出缓存 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_box"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_exported"
+                    android:textColor="@color/colorTextTertiary"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/exportedAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="120" />
+
+                <TextView
+                    android:id="@+id/exportedStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="10sp"
+                    tools:text="高 12 · 低 108" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <!-- 包内总数 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_box"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_total"
+                    android:textColor="@color/colorTextTertiary"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/totalAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="120" />
+
+                <TextView
+                    android:id="@+id/totalStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="10sp"
+                    tools:text="已完整" />
+            </LinearLayout>
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-    >
-        <TextView
-            android:id="@+id/unsupported"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:text="不支持的格式" />
-
-        <Button
-            android:id="@+id/syncBtn"
-            android:layout_width="83dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:backgroundTint="#757575"
-            android:insetLeft="2dp"
-            android:insetRight="2dp"
-            android:text="@string/sync"
-            android:textColor="#fff" />
-
-        <TextView
-            android:id="@+id/rmBtn"
-            android:layout_width="35dp"
-            android:layout_height="34dp"
-            android:background="@drawable/rounded_corner"
-            android:clickable="true"
-            android:text="@string/remove"
-            android:textAlignment="center"
-            android:textColor="#fff"
-            android:textSize="24sp" />
-    </LinearLayout>
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
-
-        android:layout_width="57dp"
-        android:layout_height="57dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize15Percent"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/videoCard"
-        android:layout_width="57dp"
-        android:layout_height="57dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        app:cardCornerRadius="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <VideoView
-            android:id="@+id/videoView"
+        <!-- 底部：状态提示 + 操作按钮栏 -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="225dp"
-            android:paddingTop="-10dp"
-            android:paddingBottom="-10dp" />
-    </androidx.cardview.widget.CardView>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/unsupported"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="12sp"
+                tools:text="已全部同步" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/downloadBtn"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="38dp"
+                android:contentDescription="@string/download_pack_originals"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:visibility="gone"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_download"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/colorBrandPrimary"
+                app:strokeColor="@color/colorStrokeSubtle"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/hideBtn"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="6dp"
+                android:contentDescription="@string/hide_pack"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_visibility_off"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/colorTextSecondary"
+                app:strokeColor="@color/colorStrokeSubtle" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rmBtn"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="6dp"
+                android:contentDescription="@string/remove"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_delete"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="18dp"
+                app:iconTint="@color/colorDanger"
+                app:strokeColor="@color/colorStrokeSubtle" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/syncBtn"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_marginStart="6dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:minHeight="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/sync"
+                android:textSize="13sp"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_sync"
+                app:iconGravity="textStart"
+                app:iconPadding="5dp"
+                app:iconSize="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

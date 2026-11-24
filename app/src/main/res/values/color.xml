@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorThemeBackground">#FFFFFFFF</color>
-    <color name="colorTextDark">#FF777777</color>
-    <color name="colorTextGray">#FF323B42</color>
+    <!-- 页面与表面层级 -->
+    <color name="colorThemeBackground">#FFF4F7FA</color>
+    <color name="colorSurfaceCard">#FFFFFFFF</color>
+    <color name="colorSurfaceSubtle">#FFEDF3F8</color>
+    <color name="colorStrokeSubtle">#FFE1E8F0</color>
+    <color name="colorDivider">#FFE8EEF4</color>
+
+    <!-- 品牌主色 -->
+    <color name="colorBrandPrimary">#FF0077B6</color>
+    <color name="colorBrandOnPrimary">#FFFFFFFF</color>
+    <color name="colorBrandContainer">#FFD8EEFC</color>
+    <color name="colorBrandOnContainer">#FF003254</color>
+
+    <!-- 文字层级 -->
+    <color name="colorTextPrimary">#FF151C24</color>
+    <color name="colorTextSecondary">#FF5A6776</color>
+    <color name="colorTextTertiary">#FF8492A3</color>
+    <color name="colorTextDark">#FF5A6776</color>
+    <color name="colorTextGray">#FF151C24</color>
+
+    <!-- 语义状态色 -->
+    <color name="colorSuccess">#FF0E9F6E</color>
+    <color name="colorSuccessContainer">#FFDEF7EC</color>
+    <color name="colorOnSuccessContainer">#FF03543F</color>
+
+    <color name="colorWarning">#FFD97706</color>
+    <color name="colorWarningContainer">#FFFEF3C7</color>
+    <color name="colorOnWarningContainer">#FF92400E</color>
+
+    <color name="colorDanger">#FFDC2626</color>
+    <color name="colorDangerContainer">#FFFEE2E2</color>
+    <color name="colorOnDangerContainer">#FF991B1B</color>
+
+    <!-- 格式徽章颜色 -->
+    <color name="colorBadgeWebpBg">#FFE0F2FE</color>
+    <color name="colorBadgeWebpText">#FF0369A1</color>
+    <color name="colorBadgeWebmBg">#FFEDE9FE</color>
+    <color name="colorBadgeWebmText">#FF6D28D9</color>
+    <color name="colorBadgeTgsBg">#FFCCFBF1</color>
+    <color name="colorBadgeTgsText">#FF0F766E</color>
 </resources>

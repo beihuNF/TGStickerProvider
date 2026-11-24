@@ -1,17 +1,31 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.AppDefault" parent="Theme.Material3.DayNight">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/colorPrimaryAccent</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryAccent</item>
-        <item name="colorOnPrimary">@color/colorPrimaryAccent</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/colorPrimaryAccent</item>
-        <item name="colorSecondaryVariant">@color/colorPrimaryAccent</item>
-        <item name="colorOnSecondary">@color/colorPrimaryAccent</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/black</item>
+    <!-- 应用深色主题（Material 3） -->
+    <style name="Theme.AppDefault" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorBrandPrimary</item>
+        <item name="colorOnPrimary">@color/colorBrandOnPrimary</item>
+        <item name="colorPrimaryContainer">@color/colorBrandContainer</item>
+        <item name="colorOnPrimaryContainer">@color/colorBrandOnContainer</item>
+
+        <item name="colorSecondary">@color/colorBrandPrimary</item>
+        <item name="colorOnSecondary">@color/colorBrandOnPrimary</item>
+        <item name="colorSecondaryContainer">@color/colorBrandContainer</item>
+        <item name="colorOnSecondaryContainer">@color/colorBrandOnContainer</item>
+
+        <item name="colorError">@color/colorDanger</item>
+        <item name="colorOnError">@color/colorOnDangerContainer</item>
+        <item name="colorErrorContainer">@color/colorDangerContainer</item>
+        <item name="colorOnErrorContainer">@color/colorOnDangerContainer</item>
+
+        <item name="android:colorBackground">@color/colorThemeBackground</item>
+        <item name="colorSurface">@color/colorSurfaceCard</item>
+        <item name="colorOnSurface">@color/colorTextPrimary</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceSubtle</item>
+        <item name="colorOnSurfaceVariant">@color/colorTextSecondary</item>
+        <item name="colorOutline">@color/colorStrokeSubtle</item>
+        <item name="colorOutlineVariant">@color/colorDivider</item>
+
+        <item name="android:statusBarColor">@color/colorThemeBackground</item>
+        <item name="android:navigationBarColor">@color/colorThemeBackground</item>
         <item name="android:windowLightStatusBar">false</item>
-        <!-- Customize your theme here. -->
     </style>
 </resources>

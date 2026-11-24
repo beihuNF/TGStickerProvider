@@ -1,233 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorThemeBackground"
     android:orientation="vertical"
     tools:context=".ui.activity.MainActivity"
-    tools:ignore="UselessParent,UseCompoundDrawables,ContentDescription">
+    tools:ignore="ContentDescription">
 
-    <TextView
-        android:paddingLeft="15dp"
-        android:paddingTop="13dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="5dp"
+    <!-- 顶部固定应用栏 -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="@string/app_name"
-        android:textColor="@color/colorTextGray"
-        android:textSize="25sp"
-        android:textStyle="bold" />
+        android:background="@color/colorThemeBackground"
+        android:minHeight="?attr/actionBarSize"
+        android:paddingHorizontal="4dp"
+        app:menu="@menu/menu_main"
+        app:subtitle="@string/info"
+        app:subtitleTextColor="@color/colorTextSecondary"
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+        app:titleTextColor="@color/colorTextPrimary" />
 
-    <LinearLayout
+    <!-- 首次引导与说明页 -->
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/tips"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="20dp"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/main_lin_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/bg_dark_round"
-            android:elevation="0dp"
-            android:gravity="center">
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="28dp">
 
-            <androidx.constraintlayout.utils.widget.ImageFilterView
-                android:id="@+id/main_img_status"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginStart="25dp"
-                android:layout_marginEnd="5dp"
-                android:src="@mipmap/ic_warn"
-                android:tint="@color/white" />
-
+            <!-- 模块激活状态卡片 -->
             <LinearLayout
+                android:id="@+id/main_lin_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="20dp"
-                android:paddingTop="10dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="10dp">
+                android:background="@drawable/bg_status_inactive"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp"
+                android:paddingVertical="16dp">
 
-                <TextView
-                    android:id="@+id/main_text_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:text="@string/module_not_activated"
-                    android:textColor="@color/white"
-                    android:textSize="18sp" />
+                <androidx.constraintlayout.utils.widget.ImageFilterView
+                    android:id="@+id/main_img_status"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@mipmap/ic_warn"
+                    app:tint="@color/colorOnWarningContainer" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:gravity="center|start"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/main_text_version"
+                        android:id="@+id/main_text_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.8"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="@string/module_version"
-                        android:textColor="@color/white"
-                        android:textSize="13sp" />
+                        android:text="@string/module_not_activated"
+                        android:textColor="@color/colorOnWarningContainer"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/main_text_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="@string/module_version"
+                            android:textColor="@color/colorOnWarningContainer"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/main_text_release_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_orange_round"
+                            android:ellipsize="end"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:singleLine="true"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:visibility="gone" />
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/main_text_release_version"
+                        android:id="@+id/main_text_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:background="@drawable/bg_orange_round"
+                        android:layout_marginTop="2dp"
+                        android:alpha="0.85"
                         android:ellipsize="end"
-                        android:paddingLeft="5dp"
-                        android:paddingTop="2dp"
-                        android:paddingRight="5dp"
-                        android:paddingBottom="2dp"
                         android:singleLine="true"
-                        android:textColor="@color/white"
+                        android:text="@string/info"
+                        android:textColor="@color/colorOnWarningContainer"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/main_text_api_way"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:alpha="0.7"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="@color/colorOnWarningContainer"
                         android:textSize="11sp"
                         android:visibility="gone" />
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.8"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:text="@string/info"
-                    android:textColor="@color/white"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/main_text_api_way"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:alpha="0.6"
-                    android:ellipsize="end"
-                    android:singleLine="true"
-                    android:textColor="@color/white"
-                    android:textSize="11sp"
-                    android:visibility="gone" />
             </LinearLayout>
+
+            <!-- 使用说明卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/colorSurfaceCard"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorStrokeSubtle"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/usage_title"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:lineSpacingExtra="5dp"
+                        android:text="@string/usage"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 合规提醒卡片 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="@color/colorDangerContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorDanger"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_warning"
+                        app:tint="@color/colorOnDangerContainer" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notice_title"
+                            android:textColor="@color/colorOnDangerContainer"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textView3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/big_tips"
+                            android:textColor="@color/colorOnDangerContainer"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 底部进入管理按钮 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/ok"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="14dp" />
+
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/usage" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/big_tips"
-            android:textSize="34sp" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="50dp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="#0091EA"
-            android:text="@string/ok"
-            android:textColor="#fff"
-            android:textSize="20sp"
-            tools:text="得行" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <!-- 贴纸管理主页面（可折叠控制台 + 舒展卡片列表） -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/manage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="20dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:visibility="gone">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/searchBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Search" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/manageAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@color/colorThemeBackground"
+            app:elevation="0dp"
+            app:liftOnScroll="false">
 
-            <Button
-                android:id="@+id/resetBtn"
+            <!-- 可随滚动自然收起的搜索、操作与筛选区 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/reset_sticker"
-                android:textColor="#fff" />
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp"
+                app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <Button
-                android:id="@+id/syncAllBtn"
+                <!-- 圆角搜索输入框 -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxBackgroundColor="@color/colorSurfaceCard"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxStrokeColor="@color/colorBrandPrimary"
+                    app:boxStrokeWidth="1dp"
+                    app:endIconMode="clear_text"
+                    app:hintEnabled="false"
+                    app:startIconDrawable="@drawable/ic_search"
+                    app:startIconTint="@color/colorTextSecondary">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/searchBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/search_hint"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingVertical="12dp"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textColorHint="@color/colorTextTertiary"
+                        android:textSize="14sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 核心快捷操作行：同步全部 & 补齐高清原件 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/syncAllBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/sync_all"
+                        android:textSize="14sp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_sync"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="18dp" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/downloadOriginalsBtn"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/download_sticker_originals"
+                        android:textSize="14sp"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_download"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="18dp" />
+                </LinearLayout>
+
+                <!-- 横向筛选与选项 Chips -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:chipSpacingHorizontal="8dp"
+                            app:singleLine="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/requiresSyncOnlyChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_requires_sync_only"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/gifQualityChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_high_quality_gif"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/stickerCategoriesChip"
+                                style="@style/Widget.Material3.Chip.Assist"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/sticker_categories"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp"
+                                app:chipIcon="@drawable/ic_category"
+                                app:chipIconSize="16dp"
+                                app:chipIconTint="@color/colorBrandPrimary" />
+                        </com.google.android.material.chip.ChipGroup>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="20dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:background="@color/colorDivider" />
+
+                        <!-- 格式筛选（单选：全部 / WEBP / WEBM / TGS） -->
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/formatFilterGroup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:checkedChip="@id/formatAllChip"
+                            app:chipSpacingHorizontal="6dp"
+                            app:selectionRequired="true"
+                            app:singleLine="true"
+                            app:singleSelection="true">
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/formatAllChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/filter_format_all"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/formatWebpChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_format_webp"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/formatWebmChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_format_webm"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/formatTgsChip"
+                                style="@style/Widget.Material3.Chip.Filter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/filter_format_tgs"
+                                android:textSize="13sp"
+                                app:chipCornerRadius="10dp" />
+                        </com.google.android.material.chip.ChipGroup>
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <!-- 吸顶列表统计条 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="同步所有表情包"
-                android:textColor="#fff" />
+                android:background="@color/colorThemeBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="18dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp">
 
-            <Button
-                android:id="@+id/refreshBtn"
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sticker_list"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/listSummaryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorTextTertiary"
+                    android:textSize="12sp"
+                    tools:text="待同步 3 个" />
+            </LinearLayout>
+
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/refresh_sticker"
-                android:textColor="#fff" />
+                android:layout_height="1dp"
+                android:background="@color/colorDivider" />
+        </com.google.android.material.appbar.AppBarLayout>
 
-        </LinearLayout>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/requiresSyncOnlySwitch"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:text="只显示待同步表情包" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/gifQualitySwitch"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:text="高清 Gif（慢）" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="@string/sticker_list" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/stickerManageView"
+        <!-- 贴纸列表与空状态容器 -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipChildren="true"
-            android:clipToPadding="true" />
-    </LinearLayout>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/stickerManageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="28dp" />
+
+            <!-- 空状态占位视图 -->
+            <LinearLayout
+                android:id="@+id/emptyStateView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="36dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:alpha="0.55"
+                    android:src="@drawable/ic_sticker_empty"
+                    app:tint="@color/colorTextTertiary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/empty_title"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/empty_subtitle"
+                    android:textColor="@color/colorTextSecondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </LinearLayout>
