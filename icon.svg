@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 108 108">
+  <defs>
+    <!-- Apple 风格青蓝对角渐变背景 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#28C2FF"/>
+      <stop offset="52%" stop-color="#0C8CE6"/>
+      <stop offset="100%" stop-color="#005DB0"/>
+    </linearGradient>
+    <!-- 贴纸柔和投影 -->
+    <filter id="stickerShadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="2.2" stdDeviation="2.8" flood-color="#002D5E" flood-opacity="0.28"/>
+    </filter>
+    <!-- 右下卷角折页光影渐变 -->
+    <linearGradient id="peelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="55%" stop-color="#E7EFF7"/>
+      <stop offset="100%" stop-color="#B9CDE0"/>
+    </linearGradient>
+    <!-- 贴纸主体微光渐变 -->
+    <linearGradient id="cardGrad" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F6FAFF"/>
+    </linearGradient>
+    <!-- 纸飞机海蓝渐变 -->
+    <linearGradient id="planeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0984CC"/>
+      <stop offset="100%" stop-color="#0066AA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角图标背景 -->
+  <rect x="0" y="0" width="108" height="108" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- 白色卷角贴纸主体 -->
+  <g filter="url(#stickerShadow)">
+    <path d="M 35 23 L 73 23 C 81 23 85 27 85 35 L 85 65.5 C 85 68 83.8 70 81.8 71.8 L 71.8 81.8 C 70 83.8 68 85 65.5 85 L 35 85 C 27 85 23 81 23 73 L 23 35 C 23 27 27 23 35 23 Z"
+          fill="url(#cardGrad)"/>
+    <!-- 右下卷角折页 -->
+    <path d="M 65.5 85 C 67.5 85 68.5 83.2 68.5 79.5 L 68.5 74.5 C 68.5 70.5 70.5 68.5 74.5 68.5 L 79.5 68.5 C 83.2 68.5 85 67.5 85 65.5 C 85 67.8 83.8 69.8 81.8 71.8 L 71.8 81.8 C 69.8 83.8 67.8 85 65.5 85 Z"
+          fill="url(#peelGrad)"/>
+  </g>
+
+  <!-- 简约 Telegram 纸飞机 -->
+  <path d="M 68.2 38.6 C 69.3 38.1 70.4 39.1 70.0 40.3 L 62.9 66.2 C 62.6 67.4 61.2 67.9 60.2 67.1 L 52.8 61.4 L 48.2 65.5 C 47.4 66.2 46.2 65.7 46.3 64.6 L 47.1 57.4 L 62.6 43.8 C 63.0 43.4 62.5 42.8 62.0 43.1 L 43.6 54.4 L 36.2 51.9 C 35.0 51.5 35.0 49.9 36.2 49.4 Z"
+        fill="url(#planeGrad)"/>
+
+  <!-- 右下简约向下导出箭头 -->
+  <path d="M 68.5 59.2 L 68.5 67.2 M 65.3 64.2 L 68.5 67.4 L 71.7 64.2"
+        fill="none" stroke="#0070B8" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

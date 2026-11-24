@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Android 13+ 莫奈取色单色主题图标（纸飞机 + 导出箭头） -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M67.2,37.2 C68.3,36.7 69.5,37.7 69.1,38.9 L61.9,65.0 C61.6,66.2 60.2,66.7 59.2,65.9 L51.7,60.1 L47.0,64.3 C46.2,65.0 45.0,64.5 45.1,63.4 L45.9,56.2 L61.5,42.5 C61.9,42.1 61.4,41.5 60.9,41.8 L42.4,53.2 L35.0,50.6 C33.8,50.2 33.8,48.6 35.0,48.1 Z" />
+
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M67.5,58.0 L67.5,66.4 M64.2,63.3 L67.5,66.6 L70.8,63.3"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2.6" />
+</vector>
