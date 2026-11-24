@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="module_scope">
-        <item>org.telegram.mdgram</item>
+        <!-- 官方客户端 -->
         <item>org.telegram.messenger</item>
-        <item>top.qwq2333.nullgram</item>
+        <item>org.telegram.messenger.web</item>
+        <item>org.telegram.messenger.beta</item>
+        <!-- 主流第三方客户端 -->
+        <item>tw.nekomimi.nekogram</item>
+        <item>tw.nekomimi.nekogram.beta</item>
+        <item>nekox.messenger</item>
+        <item>com.exteragram.messenger</item>
+        <item>com.exteragram.messenger.beta</item>
+        <item>com.radolyn.ayugram</item>
+        <item>uz.unnarsx.cherrygram</item>
+        <item>uz.unnarsx.cherrygram.beta</item>
         <item>xyz.nextalone.nagram</item>
         <item>xyz.nextalone.nnngram</item>
+        <item>nu.gpu.nagram</item>
+        <item>nu.gpu.nagramx</item>
+        <item>nu.gpu.nagramxturbo</item>
+        <item>it.octogram.android</item>
+        <item>top.qwq2333.nullgram</item>
+        <item>org.telegram.mdgram</item>
+        <item>app.mdgram.android</item>
+        <item>org.forkgram.messenger</item>
+        <item>org.forkclient.messenger.beta</item>
+        <item>xyz.momogram.messenger</item>
     </string-array>
 </resources>

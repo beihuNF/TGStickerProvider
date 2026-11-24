@@ -1,10 +1,25 @@
 package cc.microblock.TGStickerProvider
 
-const val exposedPath = "/storage/self/primary/Documents/TGStickersExported"
-const val realDataPath = "/storage/self/primary/Android/media/com.tencent.mobileqq/TGStickersExported/v1"
-const val destDataPath = "$exposedPath/cache/"
-const val tgspDataPath = "$exposedPath/mb_TGSPData"
-const val stickerDataPath =  "$tgspDataPath/sticker/"
-const val syncFlagsPath = "$tgspDataPath/stickerSyncFlags/"
-const val nomediaPath = "$exposedPath/.nomedia"
-const val nomediaPath2 = "$realDataPath/.nomedia"
+import android.os.Environment
+
+// 动态获取外部存储根目录，避免硬编码 /storage/self/primary
+private val externalStoragePath: String
+    get() = runCatching { Environment.getExternalStorageDirectory().absolutePath }
+        .getOrDefault("/storage/self/primary")
+
+val exposedPath: String
+    get() = "$externalStoragePath/Documents/TGStickersExported"
+val realDataPath: String
+    get() = "$externalStoragePath/Android/media/com.tencent.mobileqq/TGStickersExported/v1"
+val destDataPath: String
+    get() = "$exposedPath/cache/"
+val tgspDataPath: String
+    get() = "$exposedPath/mb_TGSPData"
+val stickerDataPath: String
+    get() = "$tgspDataPath/sticker/"
+val syncFlagsPath: String
+    get() = "$tgspDataPath/stickerSyncFlags/"
+val nomediaPath: String
+    get() = "$exposedPath/.nomedia"
+val nomediaPath2: String
+    get() = "$realDataPath/.nomedia"

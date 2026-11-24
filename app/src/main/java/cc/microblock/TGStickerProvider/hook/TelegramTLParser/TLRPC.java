@@ -176,6 +176,296 @@ public class TLRPC {
             stream.writeInt32(size);
         }
     }
+    public static class TL_photoStrippedSize extends PhotoSize {
+        public static final int constructor = 0xe0b0bc2e;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            type = stream.readString(exception);
+            bytes = stream.readByteArray(exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(type);
+            stream.writeByteArray(bytes);
+        }
+    }
+
+    public static class TL_photoSizeEmpty extends PhotoSize {
+        public static final int constructor = 0xe17e23c;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            type = stream.readString(exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(type);
+        }
+    }
+
+    public static class TL_photoCachedSize extends PhotoSize {
+        public static final int constructor = 0x21e1ad6;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            type = stream.readString(exception);
+            w = stream.readInt32(exception);
+            h = stream.readInt32(exception);
+            bytes = stream.readByteArray(exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(type);
+            stream.writeInt32(w);
+            stream.writeInt32(h);
+            stream.writeByteArray(bytes);
+        }
+    }
+
+    public static class TL_photoSizeProgressive extends PhotoSize {
+        public static final int constructor = 0xfa3efb95;
+
+        public ArrayList<Integer> sizes = new ArrayList<>();
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            type = stream.readString(exception);
+            w = stream.readInt32(exception);
+            h = stream.readInt32(exception);
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
+            for (int a = 0; a < count; a++) {
+                sizes.add(stream.readInt32(exception));
+            }
+            if (!sizes.isEmpty()) {
+                size = sizes.get(sizes.size() - 1);
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(type);
+            stream.writeInt32(w);
+            stream.writeInt32(h);
+            stream.writeInt32(0x1cb5c415);
+            int count = sizes.size();
+            stream.writeInt32(count);
+            for (int a = 0; a < count; a++) {
+                stream.writeInt32(sizes.get(a));
+            }
+        }
+    }
+
+    public static abstract class VideoSize extends TLObject {
+        public int flags;
+        public String type;
+        public FileLocation location;
+        public int w;
+        public int h;
+        public int size;
+        public double video_start_ts;
+        public ArrayList<Integer> background_colors = new ArrayList<>();
+        public long emoji_id;
+        public InputStickerSet stickerset;
+        public long sticker_id;
+
+        public static VideoSize TLdeserialize(long photo_id, long document_id, AbstractSerializedData stream, int constructor, boolean exception) {
+            VideoSize result = null;
+            switch (constructor) {
+                case 0xde33b094:
+                    result = new TL_videoSize();
+                    break;
+                case 0x435bb987:
+                    result = new TL_videoSize_layer115();
+                    break;
+                case 0xe831c556:
+                    result = new TL_videoSize_layer127();
+                    break;
+                case 0xda082fe:
+                    result = new TL_videoSizeStickerMarkup();
+                    break;
+                case 0xf85c413c:
+                    result = new TL_videoSizeEmojiMarkup();
+                    break;
+            }
+            if (result == null && exception) {
+                throw new RuntimeException(String.format("can't parse magic %x in VideoSize", constructor));
+            }
+            if (result != null) {
+                result.readParams(stream, exception);
+                if (result.location == null) {
+                    if (result.type != null && !result.type.isEmpty() && (photo_id != 0 || document_id != 0)) {
+                        result.location = new TL_fileLocationToBeDeprecated();
+                        if (photo_id != 0) {
+                            result.location.volume_id = -photo_id;
+                            result.location.local_id = result.type.charAt(0);
+                        } else {
+                            result.location.volume_id = -document_id;
+                            result.location.local_id = 1000 + result.type.charAt(0);
+                        }
+                    } else {
+                        result.location = new TL_fileLocationUnavailable();
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
+    public static class TL_videoSize extends VideoSize {
+        public static final int constructor = 0xde33b094;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            flags = stream.readInt32(exception);
+            type = stream.readString(exception);
+            w = stream.readInt32(exception);
+            h = stream.readInt32(exception);
+            size = stream.readInt32(exception);
+            if ((flags & 1) != 0) {
+                video_start_ts = stream.readDouble(exception);
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(flags);
+            stream.writeString(type);
+            stream.writeInt32(w);
+            stream.writeInt32(h);
+            stream.writeInt32(size);
+            if ((flags & 1) != 0) {
+                stream.writeDouble(video_start_ts);
+            }
+        }
+    }
+
+    public static class TL_videoSize_layer115 extends VideoSize {
+        public static final int constructor = 0x435bb987;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            type = stream.readString(exception);
+            location = FileLocation.TLdeserialize(stream, stream.readInt32(exception), exception);
+            w = stream.readInt32(exception);
+            h = stream.readInt32(exception);
+            size = stream.readInt32(exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(type);
+            location.serializeToStream(stream);
+            stream.writeInt32(w);
+            stream.writeInt32(h);
+            stream.writeInt32(size);
+        }
+    }
+
+    public static class TL_videoSize_layer127 extends VideoSize {
+        public static final int constructor = 0xe831c556;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            flags = stream.readInt32(exception);
+            type = stream.readString(exception);
+            location = FileLocation.TLdeserialize(stream, stream.readInt32(exception), exception);
+            w = stream.readInt32(exception);
+            h = stream.readInt32(exception);
+            size = stream.readInt32(exception);
+            if ((flags & 1) != 0) {
+                video_start_ts = stream.readDouble(exception);
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(flags);
+            stream.writeString(type);
+            location.serializeToStream(stream);
+            stream.writeInt32(w);
+            stream.writeInt32(h);
+            stream.writeInt32(size);
+            if ((flags & 1) != 0) {
+                stream.writeDouble(video_start_ts);
+            }
+        }
+    }
+
+    public static class TL_videoSizeStickerMarkup extends VideoSize {
+        public static final int constructor = 0xda082fe;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            stickerset = InputStickerSet.TLdeserialize(stream, stream.readInt32(exception), exception);
+            sticker_id = stream.readInt64(exception);
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
+            for (int a = 0; a < count; a++) {
+                background_colors.add(stream.readInt32(exception));
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stickerset.serializeToStream(stream);
+            stream.writeInt64(sticker_id);
+            stream.writeInt32(0x1cb5c415);
+            int count = background_colors.size();
+            stream.writeInt32(count);
+            for (int a = 0; a < count; a++) {
+                stream.writeInt32(background_colors.get(a));
+            }
+        }
+    }
+
+    public static class TL_videoSizeEmojiMarkup extends VideoSize {
+        public static final int constructor = 0xf85c413c;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            emoji_id = stream.readInt64(exception);
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
+            for (int a = 0; a < count; a++) {
+                background_colors.add(stream.readInt32(exception));
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt64(emoji_id);
+            stream.writeInt32(0x1cb5c415);
+            int count = background_colors.size();
+            stream.writeInt32(count);
+            for (int a = 0; a < count; a++) {
+                stream.writeInt32(background_colors.get(a));
+            }
+        }
+    }
+
     public static abstract class PhotoSize extends TLObject {
         public String type;
         public FileLocation location;
@@ -184,7 +474,7 @@ public class TLRPC {
         public int size;
         public byte[] bytes;
 
-        public int gradientTopColor, gradientBottomColor; //custom
+        public int gradientTopColor, gradientBottomColor; // 自定义渐变色字段
 
         public static PhotoSize TLdeserialize(long photo_id, long document_id, long sticker_set_id, AbstractSerializedData stream, int constructor, boolean exception) {
             PhotoSize result = null;
@@ -195,6 +485,18 @@ public class TLRPC {
                 case 0x75c78e60:
                     result = new TL_photoSize();
                     break;
+                case 0xe0b0bc2e:
+                    result = new TL_photoStrippedSize();
+                    break;
+                case 0xe17e23c:
+                    result = new TL_photoSizeEmpty();
+                    break;
+                case 0x21e1ad6:
+                    result = new TL_photoCachedSize();
+                    break;
+                case 0xfa3efb95:
+                    result = new TL_photoSizeProgressive();
+                    break;
             }
             if (result == null && exception) {
                 throw new RuntimeException(String.format("can't parse magic %x in PhotoSize", constructor));
@@ -202,7 +504,7 @@ public class TLRPC {
             if (result != null) {
                 result.readParams(stream, exception);
                 if (result.location == null) {
-                    if (result.type.length() != 0 && (photo_id != 0 || document_id != 0 || sticker_set_id != 0)) {
+                    if (result.type != null && !result.type.isEmpty() && (photo_id != 0 || document_id != 0 || sticker_set_id != 0)) {
                         result.location = new TL_fileLocationToBeDeprecated();
                         if (photo_id != 0) {
                             result.location.volume_id = -photo_id;
@@ -234,6 +536,8 @@ public class TLRPC {
         public boolean videos;
         public boolean emojis;
         public boolean text_color;
+        public boolean channel_emoji_status;
+        public boolean creator;
         public long id;
         public long access_hash;
         public String title;
@@ -297,6 +601,8 @@ public class TLRPC {
             videos = (flags & 64) != 0;
             emojis = (flags & 128) != 0;
             text_color = (flags & 512) != 0;
+            channel_emoji_status = hasFlag(flags, FLAG_10);
+            creator = hasFlag(flags, FLAG_11);
             if ((flags & 1) != 0) {
                 installed_date = stream.readInt32(exception);
             }
@@ -313,6 +619,9 @@ public class TLRPC {
                     return;
                 }
                 int count = stream.readInt32(exception);
+                if (!validateVectorCount(stream, count, exception)) {
+                    return;
+                }
                 for (int a = 0; a < count; a++) {
                     PhotoSize object = PhotoSize.TLdeserialize(0, 0, id, stream, stream.readInt32(exception), exception);
                     if (object == null) {
@@ -343,6 +652,8 @@ public class TLRPC {
             flags = videos ? (flags | 64) : (flags &~ 64);
             flags = emojis ? (flags | 128) : (flags &~ 128);
             flags = text_color ? (flags | 512) : (flags &~ 512);
+            flags = setFlag(flags, FLAG_10, channel_emoji_status);
+            flags = setFlag(flags, FLAG_11, creator);
             stream.writeInt32(flags);
             if ((flags & 1) != 0) {
                 stream.writeInt32(installed_date);
@@ -417,6 +728,9 @@ public class TLRPC {
                     return;
                 }
                 int count = stream.readInt32(exception);
+                if (!validateVectorCount(stream, count, exception)) {
+                    return;
+                }
                 for (int a = 0; a < count; a++) {
                     PhotoSize object = PhotoSize.TLdeserialize(0, 0, id, stream, stream.readInt32(exception), exception);
                     if (object == null) {
@@ -576,6 +890,9 @@ public class TLRPC {
                     return;
                 }
                 int count = stream.readInt32(exception);
+                if (!validateVectorCount(stream, count, exception)) {
+                    return;
+                }
                 for (int a = 0; a < count; a++) {
                     PhotoSize object = PhotoSize.TLdeserialize(0, 0, 0, stream, stream.readInt32(exception), exception);
                     if (object == null) {
@@ -730,6 +1047,9 @@ public class TLRPC {
                 return;
             }
             int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
             for (int a = 0; a < count; a++) {
                 documents.add(stream.readInt64(exception));
             }
@@ -775,6 +1095,9 @@ public class TLRPC {
                 return;
             }
             int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
             for (int a = 0; a < count; a++) {
                 keyword.add(stream.readString(exception));
             }
@@ -855,6 +1178,15 @@ public class TLRPC {
                     break;
                 case 0x44c1f8e9:
                     result = new TL_inputStickerSetEmojiDefaultTopicIcons();
+                    break;
+                case 0x49748553:
+                    result = new TL_inputStickerSetEmojiChannelDefaultStatuses();
+                    break;
+                case 0x1cf671a0:
+                    result = new TL_inputStickerSetTonGifts();
+                    break;
+                case 0x79e21a53:
+                    result = new TL_inputStickerSetDice_layer111();
                     break;
             }
             if (result == null && exception) {
@@ -997,6 +1329,81 @@ public class TLRPC {
 
         public void serializeToStream(AbstractSerializedData stream) {
             stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_inputStickerSetEmojiChannelDefaultStatuses extends InputStickerSet {
+        public static final int constructor = 0x49748553;
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_inputStickerSetTonGifts extends InputStickerSet {
+        public static final int constructor = 0x1cf671a0;
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_inputStickerSetDice_layer111 extends InputStickerSet {
+        public static final int constructor = 0x79e21a53;
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_documentAttributeAnimated extends DocumentAttribute {
+        public static final int constructor = 0x11b58939;
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_documentAttributeHasStickers extends DocumentAttribute {
+        public static final int constructor = 0x9801d2f7;
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_documentAttributeAudio extends DocumentAttribute {
+        public static final int constructor = 0x9852f9c6;
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            flags = stream.readInt32(exception);
+            voice = hasFlag(flags, FLAG_10);
+            duration = stream.readInt32(exception);
+            if (hasFlag(flags, FLAG_0)) {
+                title = stream.readString(exception);
+            }
+            if (hasFlag(flags, FLAG_1)) {
+                performer = stream.readString(exception);
+            }
+            if (hasFlag(flags, FLAG_2)) {
+                waveform = stream.readByteArray(exception);
+            }
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            flags = setFlag(flags, FLAG_10, voice);
+            stream.writeInt32(flags);
+            stream.writeInt32((int) duration);
+            if (hasFlag(flags, FLAG_0)) {
+                stream.writeString(title);
+            }
+            if (hasFlag(flags, FLAG_1)) {
+                stream.writeString(performer);
+            }
+            if (hasFlag(flags, FLAG_2)) {
+                stream.writeByteArray(waveform);
+            }
         }
     }
 
@@ -1252,9 +1659,9 @@ public class TLRPC {
                 case 0x6319d612:
                     result = new TL_documentAttributeSticker();
                     break;
-//                case 0x11b58939:
-//                    result = new TL_documentAttributeAnimated();
-//                    break;
+                case 0x11b58939:
+                    result = new TL_documentAttributeAnimated();
+                    break;
                 case 0x15590068:
                     result = new TL_documentAttributeFilename();
                     break;
@@ -1276,18 +1683,18 @@ public class TLRPC {
 //                case 0xfb0a5727:
 //                    result = new TL_documentAttributeSticker_old();
 //                    break;
-//                case 0x9801d2f7:
-//                    result = new TL_documentAttributeHasStickers();
-//                    break;
+                case 0x9801d2f7:
+                    result = new TL_documentAttributeHasStickers();
+                    break;
 //                case 0x994c9882:
 //                    result = new TL_documentAttributeSticker_old2();
 //                    break;
                 case 0x6c37c15c:
                     result = new TL_documentAttributeImageSize();
                     break;
-//                case 0x9852f9c6:
-//                    result = new TL_documentAttributeAudio();
-//                    break;
+                case 0x9852f9c6:
+                    result = new TL_documentAttributeAudio();
+                    break;
                 case 0xfd149899:
                     result = new TL_documentAttributeCustomEmoji();
                     break;
@@ -1322,6 +1729,9 @@ public class TLRPC {
                     return;
                 }
                 int count = stream.readInt32(exception);
+                if (!validateVectorCount(stream, count, exception)) {
+                    return;
+                }
                 for (int a = 0; a < count; a++) {
                     PhotoSize object = PhotoSize.TLdeserialize(0, id, 0, stream, stream.readInt32(exception), exception);
                     if (object == null) {
@@ -1339,12 +1749,15 @@ public class TLRPC {
                     return;
                 }
                 int count = stream.readInt32(exception);
+                if (!validateVectorCount(stream, count, exception)) {
+                    return;
+                }
                 for (int a = 0; a < count; a++) {
-//                    VideoSize object = VideoSize.TLdeserialize(0, id, stream, stream.readInt32(exception), exception);
-//                    if (object == null) {
-//                        return;
-//                    }
-//                    video_thumbs.add(object);
+                    VideoSize object = VideoSize.TLdeserialize(0, id, stream, stream.readInt32(exception), exception);
+                    if (object == null) {
+                        return;
+                    }
+                    video_thumbs.add(object);
                 }
             }
             dc_id = stream.readInt32(exception);
@@ -1364,7 +1777,7 @@ public class TLRPC {
                 vectorSerialize(stream, thumbs);
             }
             if (hasFlag(flags, FLAG_1)) {
-//                vectorSerialize(stream, video_thumbs);
+                vectorSerialize(stream, video_thumbs);
             }
             stream.writeInt32(dc_id);
             vectorSerialize(stream, attributes);
@@ -1391,6 +1804,9 @@ public class TLRPC {
                 return;
             }
             int count = stream.readInt32(exception);
+            if (!validateVectorCount(stream, count, exception)) {
+                return;
+            }
             for (int a = 0; a < count; a++) {
                 DocumentAttribute object = DocumentAttribute.TLdeserialize(stream, stream.readInt32(exception), exception);
                 if (object == null) {
@@ -1433,7 +1849,7 @@ public class TLRPC {
         public String mime_type;
         public long size;
         public ArrayList<PhotoSize> thumbs = new ArrayList<>();
-//        public ArrayList<VideoSize> video_thumbs = new ArrayList<>();
+        public ArrayList<VideoSize> video_thumbs = new ArrayList<>();
         public int version;
         public int dc_id;
         public byte[] key;
@@ -1588,6 +2004,18 @@ public class TLRPC {
         return (flags & flag) != 0;
     }
 
+    // 校验 Vector 元素数量是否合法，防止流错位导致过大内存分配
+    private static boolean validateVectorCount(AbstractSerializedData stream, int count, boolean exception) {
+        int remaining = stream.remaining();
+        if (count < 0 || count > remaining / 4) {
+            if (exception) {
+                throw new RuntimeException(String.format("invalid Vector count %d (remaining %d)", count, remaining));
+            }
+            return false;
+        }
+        return true;
+    }
+
     static <T extends TLObject> ArrayList<T> vectorDeserialize(AbstractSerializedData stream, TLDeserializer<T> read, boolean exception) {
         final int magic = stream.readInt32(exception);
         if (magic != 0x1cb5c415) {
@@ -1597,7 +2025,9 @@ public class TLRPC {
             return new ArrayList<>();
         }
         final int count = stream.readInt32(exception);
-        // TODO: Validate VectorWrongSize
+        if (!validateVectorCount(stream, count, exception)) {
+            return new ArrayList<>();
+        }
         final ArrayList<T> result = new ArrayList<>(count);
         for (int i = 0; i < count; ++i) {
             T deserialize = read.deserialize(stream, stream.readInt32(exception), exception);

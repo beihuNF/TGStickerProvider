@@ -8,18 +8,28 @@ A Xposed/LSPosed plugin to dump stickers from Telegram. Almost all 3rd-party tel
 ### Release
 You can download the latest release [here](https://t.me/microblock_pub/159).
 
-### Compatibility
+### 兼容性（Compatibility）
 
-✅ NullGram  
+支持以下官方及主流基于 Telegram Android（MTProto / `cache4.db`）的第三方客户端：
+
+✅ Telegram（Google Play / 官网直装 Web / Beta）  
+✅ Nekogram / Nekogram Beta  
+✅ NekoX  
+✅ exteraGram / exteraGram Beta  
+✅ AyuGram  
+✅ Cherrygram / Cherrygram Beta  
+✅ Nagram / NagramX / NagramX Turbo / Nnngram  
+✅ OctoGram  
+✅ Nullgram  
 ✅ MDGram  
-✅ Telegram (Official)  
-✅ Telegram (Play)  
-✅ AyuGram 
+✅ Forkgram / Forkgram Beta  
+✅ Momogram  
 
-❎ Telegram X (and all its forks)
+❎ Telegram X（基于 TDLib，及其所有衍生客户端均**不支持**）
 
-### Limitations
-Only one Telegram client can be used to dump stickers at once. If the plugin is attached to multiple clients, only one of them could work, due to the limitation of Android. 
+### 使用限制（Limitations）
+- 同时安装并勾选多个 Telegram 客户端时，可在应用内选择其中一个活跃客户端作为首选下载宿主。
+- **不支持 Telegram X 及任何基于 TDLib 的客户端**，因为其本地缓存与数据库架构与官方 Telegram Android 客户端完全不同。
 
 ### Credits
 

@@ -50,8 +50,6 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.recyclerview:recyclerview")
     compileOnly(de.robv.android.xposed.api)
     implementation(com.highcapable.yukihookapi.api)
@@ -66,4 +64,5 @@ dependencies {
     androidTestImplementation(androidx.test.espresso.espresso.core)
     implementation("io.github.maitrungduc1410:ffmpeg-kit-min:6.0.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.airbnb.android:lottie:6.4.1")
 }

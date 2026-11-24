@@ -12,21 +12,11 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 保留泛型签名、内部类与行号信息，防止 Release 模式下反射泛型 ViewBinding 崩溃并保留堆栈信息
+-keepattributes Signature,InnerClasses,EnclosingMethod,SourceFile,LineNumberTable
 
 # FreeReflection
 -keep class me.weishu.reflection.** {*;}
-
--assumenosideeffects class kotlin.jvm.internal.Intrinsics {
-    public static *** throwUninitializedProperty(...);
-    public static *** throwUninitializedPropertyAccessException(...);
-}
 
 -keepclassmembers class * implements androidx.viewbinding.ViewBinding {
     *** inflate(android.view.LayoutInflater);
@@ -37,3 +27,6 @@
     <init>();
     *** inflate(android.view.LayoutInflater);
 }
+
+# Okio uses this optional nullability annotation for static analysis.
+-dontwarn javax.annotation.Nullable

@@ -4,11 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class SerializedData extends AbstractSerializedData {
+    private static final Logger LOGGER = Logger.getLogger(SerializedData.class.getName());
     protected boolean isOut = true;
     private ByteArrayOutputStream outbuf;
     private DataOutputStream out;
@@ -50,7 +55,7 @@ public class SerializedData extends AbstractSerializedData {
                 inbuf = null;
             }
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.log(Level.WARNING, "关闭输入缓冲区失败", e);
         }
         try {
             if (in != null) {
@@ -58,7 +63,7 @@ public class SerializedData extends AbstractSerializedData {
                 in = null;
             }
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.log(Level.WARNING, "关闭输入流失败", e);
         }
         try {
             if (outbuf != null) {
@@ -66,7 +71,7 @@ public class SerializedData extends AbstractSerializedData {
                 outbuf = null;
             }
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.log(Level.WARNING, "关闭输出缓冲区失败", e);
         }
         try {
             if (out != null) {
@@ -74,7 +79,7 @@ public class SerializedData extends AbstractSerializedData {
                 out = null;
             }
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.log(Level.WARNING, "关闭输出流失败", e);
         }
     }
 
@@ -87,6 +92,7 @@ public class SerializedData extends AbstractSerializedData {
         isOut = false;
         inbuf = new ByteArrayInputStream(data);
         in = new DataInputStream(inbuf);
+        len = 0;
     }
 
     public void writeInt32(int x) {
@@ -103,10 +109,7 @@ public class SerializedData extends AbstractSerializedData {
                 out.write(x >> (i * 8));
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write int32 error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 int32 失败", e);
         }
     }
 
@@ -124,10 +127,7 @@ public class SerializedData extends AbstractSerializedData {
                 out.write((int) (x >> (i * 8)));
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write int64 error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 int64 失败", e);
         }
     }
 
@@ -151,10 +151,7 @@ public class SerializedData extends AbstractSerializedData {
                 len += b.length;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write raw error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入原始字节数组失败", e);
         }
     }
 
@@ -166,10 +163,7 @@ public class SerializedData extends AbstractSerializedData {
                 len += count;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write bytes error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入字节切片失败", e);
         }
     }
 
@@ -181,10 +175,7 @@ public class SerializedData extends AbstractSerializedData {
                 len += 1;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write byte error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入单字节失败", e);
         }
     }
 
@@ -196,10 +187,7 @@ public class SerializedData extends AbstractSerializedData {
                 len += 1;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write byte error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入单字节失败", e);
         }
     }
 
@@ -236,21 +224,15 @@ public class SerializedData extends AbstractSerializedData {
                 i++;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write byte array error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 TL 字节数组失败", e);
         }
     }
 
     public void writeString(String s) {
         try {
-            writeByteArray(s.getBytes("UTF-8"));
+            writeByteArray(s.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write string error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入字符串失败", e);
         }
     }
 
@@ -287,10 +269,7 @@ public class SerializedData extends AbstractSerializedData {
                 i++;
             }
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write byte array error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 TL 字节数组切片失败", e);
         }
     }
 
@@ -298,10 +277,7 @@ public class SerializedData extends AbstractSerializedData {
         try {
             writeInt64(Double.doubleToRawLongBits(d));
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write double error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 double 失败", e);
         }
     }
 
@@ -309,10 +285,7 @@ public class SerializedData extends AbstractSerializedData {
         try {
             writeInt32(Float.floatToIntBits(d));
         } catch (Exception e) {
-            if (true) {
-                System.out.println("write float error");
-                System.out.println(e);
-            }
+            LOGGER.log(Level.WARNING, "写入 float 失败", e);
         }
     }
 
@@ -327,6 +300,7 @@ public class SerializedData extends AbstractSerializedData {
         isOut = false;
         inbuf = new ByteArrayInputStream(newData);
         in = new DataInputStream(inbuf);
+        len = 0;
     }
 
     public byte[] toByteArray() {
@@ -334,15 +308,16 @@ public class SerializedData extends AbstractSerializedData {
     }
 
     public void skip(int count) {
-        if (count == 0) {
+        if (count <= 0) {
             return;
         }
         if (!justCalc) {
             if (in != null) {
                 try {
-                    in.skipBytes(count);
+                    int skipped = in.skipBytes(count);
+                    len += skipped;
                 } catch (Exception e) {
-                    System.out.println(e);
+                    LOGGER.log(Level.WARNING, "跳过字节失败", e);
                 }
             }
         } else {
@@ -352,6 +327,16 @@ public class SerializedData extends AbstractSerializedData {
 
     public int getPosition() {
         return len;
+    }
+
+    // 读取单个无符号字节并在遇到流结束时抛出异常
+    private int readUnsignedByteOrThrow() throws Exception {
+        int b = in.read();
+        if (b < 0) {
+            throw new EOFException("unexpected EOF");
+        }
+        len++;
+        return b;
     }
 
     public boolean readBool(boolean exception) {
@@ -364,26 +349,19 @@ public class SerializedData extends AbstractSerializedData {
         if (exception) {
             throw new RuntimeException("Not bool value!");
         } else {
-            if (true) {
-                System.out.println("Not bool value!");
-            }
+            LOGGER.warning("无效的布尔值构造器");
         }
         return false;
     }
 
     public byte readByte(boolean exception) {
         try {
-            byte result = in.readByte();
-            len += 1;
-            return result;
+            return (byte) readUnsignedByteOrThrow();
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read byte error", e);
             } else {
-                if (true) {
-                    System.out.println("read byte error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取单字节失败", e);
             }
         }
         return 0;
@@ -391,21 +369,29 @@ public class SerializedData extends AbstractSerializedData {
 
     public void readBytes(byte[] b, boolean exception) {
         try {
-            in.read(b);
+            if (b.length > remaining()) {
+                throw new EOFException("requested " + b.length + " bytes, remaining " + remaining());
+            }
+            in.readFully(b);
             len += b.length;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read bytes error", e);
             } else {
-                if (true) {
-                    System.out.println("read bytes error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取字节数组失败", e);
             }
         }
     }
 
     public byte[] readData(int count, boolean exception) {
+        if (count < 0 || count > remaining()) {
+            if (exception) {
+                throw new RuntimeException("invalid readData count: " + count + ", remaining: " + remaining());
+            } else {
+                LOGGER.warning("非法的 readData 长度: " + count);
+                return new byte[0];
+            }
+        }
         byte[] arr = new byte[count];
         readBytes(arr, exception);
         return arr;
@@ -413,32 +399,13 @@ public class SerializedData extends AbstractSerializedData {
 
     public String readString(boolean exception) {
         try {
-            int sl = 1;
-            int l = in.read();
-            len++;
-            if (l >= 254) {
-                l = in.read() | (in.read() << 8) | (in.read() << 16);
-                len += 3;
-                sl = 4;
-            }
-            byte[] b = new byte[l];
-            in.read(b);
-            len++;
-            int i = sl;
-            while ((l + i) % 4 != 0) {
-                in.read();
-                len++;
-                i++;
-            }
-            return new String(b, "UTF-8");
+            byte[] b = readTlBytes();
+            return new String(b, StandardCharsets.UTF_8);
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read string error", e);
             } else {
-                if (true) {
-                    System.out.println("read string error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取字符串失败", e);
             }
         }
         return null;
@@ -446,35 +413,40 @@ public class SerializedData extends AbstractSerializedData {
 
     public byte[] readByteArray(boolean exception) {
         try {
-            int sl = 1;
-            int l = in.read();
-            len++;
-            if (l >= 254) {
-                l = in.read() | (in.read() << 8) | (in.read() << 16);
-                len += 3;
-                sl = 4;
-            }
-            byte[] b = new byte[l];
-            in.read(b);
-            len++;
-            int i = sl;
-            while ((l + i) % 4 != 0) {
-                in.read();
-                len++;
-                i++;
-            }
-            return b;
+            return readTlBytes();
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read byte array error", e);
             } else {
-                if (true) {
-                    System.out.println("read byte array error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取 TL 字节数组失败", e);
             }
         }
         return null;
+    }
+
+    // 按 TL 长度前缀与 4 字节对齐规则读取字节数组，校验剩余长度防止越界分配
+    private byte[] readTlBytes() throws Exception {
+        int sl = 1;
+        int l = readUnsignedByteOrThrow();
+        if (l >= 254) {
+            int b0 = readUnsignedByteOrThrow();
+            int b1 = readUnsignedByteOrThrow();
+            int b2 = readUnsignedByteOrThrow();
+            l = b0 | (b1 << 8) | (b2 << 16);
+            sl = 4;
+        }
+        int padding = (4 - ((l + sl) % 4)) % 4;
+        int rem = remaining();
+        if (l < 0 || l > rem - padding) {
+            throw new EOFException("invalid TL byte array length " + l + " (padding " + padding + ", remaining " + rem + ")");
+        }
+        byte[] b = new byte[l];
+        in.readFully(b);
+        len += l;
+        for (int i = 0; i < padding; i++) {
+            readUnsignedByteOrThrow();
+        }
+        return b;
     }
 
     public double readDouble(boolean exception) {
@@ -484,10 +456,7 @@ public class SerializedData extends AbstractSerializedData {
             if (exception) {
                 throw new RuntimeException("read double error", e);
             } else {
-                if (true) {
-                    System.out.println("read double error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取 double 失败", e);
             }
         }
         return 0;
@@ -500,10 +469,7 @@ public class SerializedData extends AbstractSerializedData {
             if (exception) {
                 throw new RuntimeException("read float error", e);
             } else {
-                if (true) {
-                    System.out.println("read float error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取 float 失败", e);
             }
         }
         return 0;
@@ -513,18 +479,14 @@ public class SerializedData extends AbstractSerializedData {
         try {
             int i = 0;
             for (int j = 0; j < 4; j++) {
-                i |= (in.read() << (j * 8));
-                len++;
+                i |= (readUnsignedByteOrThrow() << (j * 8));
             }
             return i;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read int32 error", e);
             } else {
-                if (true) {
-                    System.out.println("read int32 error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取 int32 失败", e);
             }
         }
         return 0;
@@ -534,18 +496,14 @@ public class SerializedData extends AbstractSerializedData {
         try {
             long i = 0;
             for (int j = 0; j < 8; j++) {
-                i |= ((long) in.read() << (j * 8));
-                len++;
+                i |= ((long) readUnsignedByteOrThrow() << (j * 8));
             }
             return i;
         } catch (Exception e) {
             if (exception) {
                 throw new RuntimeException("read int64 error", e);
             } else {
-                if (true) {
-                    System.out.println("read int64 error");
-                    System.out.println(e);
-                }
+                LOGGER.log(Level.WARNING, "读取 int64 失败", e);
             }
         }
         return 0;
@@ -554,9 +512,9 @@ public class SerializedData extends AbstractSerializedData {
     @Override
     public int remaining() {
         try {
-            return in.available();
+            return in != null ? in.available() : 0;
         } catch (Exception e) {
-            return Integer.MAX_VALUE;
+            return 0;
         }
     }
 }
