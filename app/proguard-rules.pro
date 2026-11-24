@@ -30,3 +30,6 @@
 
 # Okio uses this optional nullability annotation for static analysis.
 -dontwarn javax.annotation.Nullable
+
+# 保留 DexKit JNI 桥接类，防止 Release 混淆导致 native 调用失败
+-keep class org.luckypray.dexkit.** { *; }

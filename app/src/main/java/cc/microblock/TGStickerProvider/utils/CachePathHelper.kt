@@ -39,9 +39,9 @@ object CachePathHelper {
             }
         }
 
-        // 优先通过宿主 FileLoader 反射获取真实缓存与文档双目录，兼容官方及各类第三方客户端
+        // 优先通过宿主 FileLoader（支持 DexKit 反混淆）获取真实缓存与文档双目录
         if (classLoader != null) {
-            for (dir in getTelegramFileLoaderDirs(classLoader)) {
+            for (dir in getTelegramFileLoaderDirs(classLoader, context)) {
                 addIfValid(dir)
             }
         }
@@ -71,9 +71,13 @@ object CachePathHelper {
     }
 
     /**
-     * 通过反射调用宿主 Telegram 客户端的 FileLoader.getDirectory 获取缓存与文档目录
+     * 通过 TelegramBridge 调用宿主 FileLoader.getDirectory 获取缓存（4）与文档（3）目录，兼容混淆后的官方客户端
      */
-    private fun getTelegramFileLoaderDirs(classLoader: ClassLoader): List<File> {
+    private fun getTelegramFileLoaderDirs(classLoader: ClassLoader, context: Context?): List<File> {
+        val bridge = cc.microblock.TGStickerProvider.hook.TelegramBridge.resolve(classLoader, context)
+        if (bridge != null) {
+            return listOf(4, 3).mapNotNull { dirType -> bridge.getMediaDirectory(dirType) }
+        }
         return runCatching {
             val fileLoaderClass = classLoader.loadClass("org.telegram.messenger.FileLoader")
             val dirFields = listOf("MEDIA_DIR_CACHE", "MEDIA_DIR_DOCUMENT")

@@ -80,4 +80,5 @@ dependencies {
     implementation("io.github.maitrungduc1410:ffmpeg-kit-min:6.0.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.airbnb.android:lottie:6.4.1")
+    implementation("org.luckypray:dexkit:2.0.3")
 }

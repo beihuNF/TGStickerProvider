@@ -65,7 +65,7 @@ class HookEntry : IYukiHookXposedInit {
             }
 
             val cache = TelegramStickerCache(hostFilesDir)
-            val downloads = TelegramStickerDownloads(hostLoader, ::exportOriginal)
+            val downloads = TelegramStickerDownloads(hostLoader, { this.appContext }, ::exportOriginal)
             var packs = emptyMap<Long, StickerPack>()
             var cachedPacks = emptyList<CachedStickerPack>()
             var lastCatalog: String? = null
@@ -142,7 +142,7 @@ class HookEntry : IYukiHookXposedInit {
     }
 
     /**
-     * 登记活跃宿主并按策略更新首选下载宿主（仅在未指定或当前即为首选宿主时写入）
+     * 登记活跃宿主并更新首选下载宿主（当前活跃客户端在写入目录后接管下载广播）
      */
     private fun updateActiveHost(packageName: String) {
         runCatching { registerActiveHost(packageName) }
@@ -150,8 +150,7 @@ class HookEntry : IYukiHookXposedInit {
         val currentRaw = runCatching {
             if (downloadHost.isFile) downloadHost.readText() else null
         }.getOrNull()
-        val currentPreferred = currentRaw?.trim().orEmpty()
-        if (currentPreferred.isEmpty() || (currentPreferred == packageName && currentRaw != packageName)) {
+        if (currentRaw?.trim() != packageName) {
             writeAtomically(downloadHost) { it.writeText(packageName) }
         }
     }
