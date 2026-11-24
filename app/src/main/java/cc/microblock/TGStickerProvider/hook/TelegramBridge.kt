@@ -188,7 +188,8 @@ internal class TelegramBridge private constructor(
     }
 
     fun getPathToAttach(fileLoader: Any, document: Any, forceCache: Boolean): File? = runCatching {
-        fileGetPathToAttach.invoke(fileLoader, document, forceCache) as? File
+        val receiver = if (Modifier.isStatic(fileGetPathToAttach.modifiers)) null else fileLoader
+        fileGetPathToAttach.invoke(receiver, document, forceCache) as? File
     }.getOrNull()
 
     fun getAttachFileName(document: Any): String? {
@@ -199,18 +200,21 @@ internal class TelegramBridge private constructor(
     fun isLoadingFile(fileLoader: Any, attachFileName: String?): Boolean {
         if (attachFileName.isNullOrEmpty()) return false
         val method = fileIsLoadingFile ?: return false
-        return runCatching { method.invoke(fileLoader, attachFileName) == true }.getOrDefault(false)
+        val receiver = if (Modifier.isStatic(method.modifiers)) null else fileLoader
+        return runCatching { method.invoke(receiver, attachFileName) == true }.getOrDefault(false)
     }
 
     fun loadFile(fileLoader: Any, document: Any, parent: Any) {
         val method = resolveLoadMethod(document.javaClass)
             ?: throw NoSuchMethodException("No compatible FileLoader.loadFile for ${document.javaClass.name}")
-        method.invoke(fileLoader, document, parent, downloadPriority, 1)
+        val receiver = if (Modifier.isStatic(method.modifiers)) null else fileLoader
+        method.invoke(receiver, document, parent, downloadPriority, 1)
     }
 
     fun cancelLoadFile(fileLoader: Any, document: Any) {
         val method = resolveCancelMethod(document.javaClass) ?: return
-        runCatching { method.invoke(fileLoader, document) }
+        val receiver = if (Modifier.isStatic(method.modifiers)) null else fileLoader
+        runCatching { method.invoke(receiver, document) }
             .onFailure { YLog.warn("Could not cancel Telegram sticker download", it) }
     }
 
@@ -523,12 +527,13 @@ internal class TelegramBridge private constructor(
                 val connName = mapping.optString("connClass")
                 val connCls = if (connName.isNotEmpty()) runCatching { loader.loadClass(connName) }.getOrNull() else null
 
-                val mediaGetInstance = mediaCls.declaredMethods.first { m ->
+                val mediaGetInstance = mediaCls.declaredMethods.firstOrNull { m ->
                     Modifier.isStatic(m.modifiers) &&
                         m.parameterTypes.size == 1 &&
                         m.parameterTypes[0] == Int::class.javaPrimitiveType &&
                         m.returnType == mediaCls
-                }.apply { isAccessible = true }
+                }?.apply { isAccessible = true }
+                    ?: error("mediaGetInstance not found in ${mediaCls.name}")
 
                 val mediaGetStickerSetById = mediaCls.getDeclaredMethod(
                     mapping.getString("mediaGetStickerSet"),
@@ -543,12 +548,13 @@ internal class TelegramBridge private constructor(
                     }.getOrNull()
                 } else null
 
-                val fileGetInstance = fileCls.declaredMethods.first { m ->
+                val fileGetInstance = fileCls.declaredMethods.firstOrNull { m ->
                     Modifier.isStatic(m.modifiers) &&
                         m.parameterTypes.size == 1 &&
                         m.parameterTypes[0] == Int::class.javaPrimitiveType &&
                         m.returnType == fileCls
-                }.apply { isAccessible = true }
+                }?.apply { isAccessible = true }
+                    ?: error("fileGetInstance not found in ${fileCls.name}")
 
                 val fileGetDirectory = fileCls.declaredMethods.firstOrNull { m ->
                     Modifier.isStatic(m.modifiers) &&
@@ -557,14 +563,15 @@ internal class TelegramBridge private constructor(
                         m.returnType == File::class.java
                 }?.apply { isAccessible = true }
 
-                val fileGetPathToAttach = fileCls.declaredMethods.first { m ->
-                    !Modifier.isStatic(m.modifiers) &&
-                        m.parameterTypes.size == 2 &&
+                // 官方版中 getPathToAttach(TLObject, boolean) 为静态方法，同时兼容实例方法
+                val fileGetPathToAttach = fileCls.declaredMethods.firstOrNull { m ->
+                    m.parameterTypes.size == 2 &&
                         m.parameterTypes[1] == Boolean::class.javaPrimitiveType &&
                         m.returnType == File::class.java &&
                         !m.parameterTypes[0].isPrimitive &&
                         m.parameterTypes[0] != String::class.java
-                }.apply { isAccessible = true }
+                }?.apply { isAccessible = true }
+                    ?: error("fileGetPathToAttach not found in ${fileCls.name}")
 
                 val tlObjectType = fileGetPathToAttach.parameterTypes[0]
                 val fileGetAttachFileName = fileCls.declaredMethods.firstOrNull { m ->
@@ -590,7 +597,7 @@ internal class TelegramBridge private constructor(
                         m.parameterTypes[3] == Int::class.javaPrimitiveType &&
                         m.returnType == Void.TYPE
                 }.onEach { it.isAccessible = true }
-                check(fileLoadCandidates.isNotEmpty())
+                check(fileLoadCandidates.isNotEmpty()) { "fileLoadCandidates empty in ${fileCls.name}" }
 
                 val fileCancelCandidates = fileCls.declaredMethods.filter { m ->
                     !Modifier.isStatic(m.modifiers) &&
@@ -606,6 +613,7 @@ internal class TelegramBridge private constructor(
                         m.parameterTypes.size == 2
                 }?.apply { isAccessible = true }
 
+                lastError = ""
                 TelegramBridge(
                     loader = loader,
                     mediaDataControllerClass = mediaCls,
@@ -628,6 +636,7 @@ internal class TelegramBridge private constructor(
                     isObfuscated = true
                 )
             }.onFailure {
+                lastError = "映射构建失败: ${it.message}"
                 YLog.warn("Could not build TelegramBridge from DexKit mapping", it)
             }.getOrNull()
         }
