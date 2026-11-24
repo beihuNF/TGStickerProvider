@@ -227,11 +227,12 @@ internal class TelegramStickerDownloads(
 
         val bridge = resolveBridge()
         if (bridge == null) {
+            val detail = TelegramBridge.lastError
             progress = requireNotNull(progress).copy(
                 finished = pending.size,
                 failed = pending.size,
                 done = true,
-                message = "未能解析当前 Telegram 客户端的下载接口"
+                message = if (detail.isNotEmpty()) "未能解析下载接口（$detail）" else "未能解析当前 Telegram 客户端的下载接口"
             )
             pending.clear()
             return

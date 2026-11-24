@@ -247,12 +247,15 @@ internal class TelegramBridge private constructor(
 
     companion object {
         private const val DEFAULT_MAX_ACCOUNT_COUNT = 4
-        private const val CACHE_FILE_NAME = "tgsp_dexkit_map_v1.json"
+        private const val CACHE_FILE_NAME = "tgsp_dexkit_map_v2.json"
 
         @Volatile
         private var cachedBridge: TelegramBridge? = null
         @Volatile
         private var dexkitLoaded = false
+        @Volatile
+        var lastError: String = ""
+            private set
 
         fun resolve(loader: ClassLoader, context: Context?): TelegramBridge? {
             cachedBridge?.let { return it }
@@ -395,12 +398,22 @@ internal class TelegramBridge private constructor(
                     dexkitLoaded = true
                 }
                 DexKitBridge.create(apkPath).use { bridge ->
-                    // 1. 定位 MediaDataController（包含 stickers_v2 查询语句）
-                    val mediaClassData = bridge.findClass {
+                    // 1. 优先通过 (long) -> TLRPC$TL_messages_stickerSet 唯一特征同时定位 MediaDataController 与 getStickerSetById
+                    val directStickerSetMethod = bridge.findMethod {
                         matcher {
-                            usingStrings("stickers_v2", "SELECT data, date, hash FROM stickers_v2 WHERE id = ")
+                            paramTypes("long")
+                            returnType = "org.telegram.tgnet.TLRPC\$TL_messages_stickerSet"
                         }
-                    }.firstOrNull() ?: bridge.findClass {
+                    }.firstOrNull { m ->
+                        !Modifier.isStatic(m.modifiers) &&
+                            (m.declaredClass?.methods?.any { gm ->
+                                Modifier.isStatic(gm.modifiers) && gm.paramCount == 1 &&
+                                    gm.paramTypeNames.firstOrNull() == "int" &&
+                                    gm.returnTypeName == m.className
+                            } == true)
+                    }
+
+                    val mediaClassData = directStickerSetMethod?.declaredClass ?: bridge.findClass {
                         matcher {
                             usingStrings("stickers_v2")
                         }
@@ -410,30 +423,57 @@ internal class TelegramBridge private constructor(
                                 m.paramTypeNames.firstOrNull() == "int" &&
                                 m.returnTypeName == cls.name
                         }
-                    } ?: return@use null
+                    } ?: run {
+                        lastError = "DexKit 未找到 MediaDataController"
+                        return@use null
+                    }
 
-                    // 2. 定位 FileLoader（包含 Telegram Documents 或 .preload 且存在静态 (int)->File）
+                    val getStickerSetMethod = directStickerSetMethod ?: run {
+                        val longMethods = mediaClassData.methods.filter { m ->
+                            !Modifier.isStatic(m.modifiers) && m.paramCount == 1 &&
+                                m.paramTypeNames.firstOrNull() == "long" &&
+                                m.returnTypeName != "void" &&
+                                !m.returnTypeName.startsWith("java.") &&
+                                !m.returnTypeName.startsWith("android.")
+                        }
+                        longMethods.firstOrNull { m ->
+                            (m.returnType?.fields?.count { f ->
+                                f.typeName == "java.util.ArrayList" || f.typeName == "java.util.List"
+                            } ?: 0) >= 2
+                        } ?: longMethods.firstOrNull { m ->
+                            m.returnType?.fields?.any { f ->
+                                f.typeName == "java.util.ArrayList" || f.typeName == "java.util.List"
+                            } == true
+                        }
+                    } ?: run {
+                        lastError = "DexKit 未找到 getStickerSetById"
+                        return@use null
+                    }
+
+                    // 2. 定位 FileLoader（使用类内真实常量字符串 fileUploadQueue / .enc.key）
+                    val hasFileLoaderShape: (org.luckypray.dexkit.result.ClassData) -> Boolean = { cls ->
+                        cls.methods.any { m ->
+                            Modifier.isStatic(m.modifiers) && m.paramCount == 1 &&
+                                m.paramTypeNames.firstOrNull() == "int" &&
+                                m.returnTypeName == cls.name
+                        } && cls.methods.any { m ->
+                            m.paramCount == 2 &&
+                                m.paramTypeNames.getOrNull(1) == "boolean" &&
+                                m.returnTypeName == "java.io.File"
+                        }
+                    }
                     val fileClassData = bridge.findClass {
                         matcher {
-                            usingStrings("Telegram Documents")
+                            usingStrings("fileUploadQueue")
                         }
-                    }.firstOrNull { cls ->
-                        cls.methods.any { m ->
-                            Modifier.isStatic(m.modifiers) && m.paramCount == 1 &&
-                                m.paramTypeNames.firstOrNull() == "int" &&
-                                m.returnTypeName == "java.io.File"
-                        }
-                    } ?: bridge.findClass {
+                    }.firstOrNull(hasFileLoaderShape) ?: bridge.findClass {
                         matcher {
-                            usingStrings(".preload", ".temp")
+                            usingStrings(".enc.key", "sent_")
                         }
-                    }.firstOrNull { cls ->
-                        cls.methods.any { m ->
-                            Modifier.isStatic(m.modifiers) && m.paramCount == 1 &&
-                                m.paramTypeNames.firstOrNull() == "int" &&
-                                m.returnTypeName == "java.io.File"
-                        }
-                    } ?: return@use null
+                    }.firstOrNull(hasFileLoaderShape) ?: run {
+                        lastError = "DexKit 未找到 FileLoader"
+                        return@use null
+                    }
 
                     // 3. 定位 ConnectionsManager（native_resumeNetwork 永不混淆）
                     val resumeMethodData = bridge.findMethod {
@@ -442,7 +482,7 @@ internal class TelegramBridge private constructor(
                         }
                     }.firstOrNull()
 
-                    // 4. 定位 checkStickers(int) 与 loadStickers 方法特征
+                    // 4. 定位 checkStickers(int)
                     val stickersQueryMethod = mediaClassData.methods.firstOrNull { m ->
                         m.usingStrings.any { it.contains("stickers_v2") }
                     }
@@ -460,18 +500,7 @@ internal class TelegramBridge private constructor(
                             }
                     }
 
-                    // 5. 定位 getStickerSetById(long)（返回类含 ArrayList 字段）
-                    val getStickerSetMethod = mediaClassData.methods.firstOrNull { m ->
-                        !Modifier.isStatic(m.modifiers) && m.paramCount == 1 &&
-                            m.paramTypeNames.firstOrNull() == "long" &&
-                            m.returnTypeName != "void" &&
-                            !m.returnTypeName.startsWith("java.") &&
-                            !m.returnTypeName.startsWith("android.") &&
-                            (m.returnType?.fields?.any { f ->
-                                f.typeName == "java.util.ArrayList" || f.typeName == "java.util.List"
-                            } == true)
-                    } ?: return@use null
-
+                    lastError = ""
                     JSONObject().apply {
                         put("stamp", apkStamp)
                         put("mediaClass", mediaClassData.name)
@@ -482,6 +511,7 @@ internal class TelegramBridge private constructor(
                     }
                 }
             }.onFailure {
+                lastError = "DexKit 异常: ${it.javaClass.simpleName}: ${it.message}"
                 YLog.warn("DexKit scan failed for obfuscated Telegram", it)
             }.getOrNull()
         }
